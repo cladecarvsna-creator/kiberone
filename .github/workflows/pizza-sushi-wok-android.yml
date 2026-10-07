@@ -1,0 +1,69 @@
+name: Пицца Суши Вок — Android APK
+
+on:
+  push:
+    paths:
+      - 'pizza-sushi-wok/**'
+      - '.github/workflows/pizza-sushi-wok-android.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: android-apk-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: pizza-sushi-wok
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: pizza-sushi-wok/package-lock.json
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Android project
+        run: npx expo prebuild --platform android --no-install
+        env:
+          CI: 1
+
+      - name: Build APK
+        working-directory: pizza-sushi-wok/android
+        run: ./gradlew assembleRelease --no-daemon -PreactNativeArchitectures=arm64-v8a,armeabi-v7a
+
+      - name: Rename APK
+        run: cp android/app/build/outputs/apk/release/app-release.apk pizza-sushi-wok.apk
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: pizza-sushi-wok-apk
+          path: pizza-sushi-wok/pizza-sushi-wok.apk
+
+      - name: Publish APK release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete android-latest --yes --cleanup-tag || true
+          gh release create android-latest pizza-sushi-wok.apk \
+            --target "${{ github.sha }}" \
+            --prerelease \
+            --title "Пицца Суши Вок — APK для Android" \
+            --notes "Свежая сборка из ${{ github.ref_name }} (${{ github.sha }}). Скачай pizza-sushi-wok.apk на телефон и установи."

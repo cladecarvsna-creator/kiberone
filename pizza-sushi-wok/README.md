@@ -16,6 +16,12 @@ npx expo start
 
 Отсканируй QR-код приложением **Expo Go** на телефоне или нажми `w`, чтобы открыть в браузере.
 
+## Android APK
+
+Готовый APK собирается в GitHub Actions (`.github/workflows/pizza-sushi-wok-android.yml`) на каждый пуш и выкладывается в релиз
+[android-latest](https://github.com/cladecarvsna-creator/kiberone/releases/tag/android-latest).
+Открой ссылку на телефоне, скачай `pizza-sushi-wok.apk` и установи (Андроид попросит разрешить установку из неизвестных источников).
+
 ## Структура
 
 - `App.tsx` — шрифты, переключение между приветствием и экранами с таб-баром
