@@ -1,66 +1,66 @@
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import Header from '../components/Header';
-import { colors, fonts } from '../theme';
+import { ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
+import FadeIn from '../components/FadeIn';
+import { FrostCard } from '../components/Glass';
+import PressableScale from '../components/PressableScale';
+import ScreenHeader from '../components/ScreenHeader';
+import { displayValue, SettingField, settingSections } from '../data';
+import { useColors, useStore } from '../store';
+import { fonts } from '../theme';
 
-type Row = { label: string; value: string };
+type Props = {
+  onEdit: (field: SettingField) => void;
+  bottomInset: number;
+};
 
-const sections: { title: string; rows: Row[] }[] = [
-  {
-    title: 'Профиль',
-    rows: [
-      { label: 'Имя', value: 'Иван' },
-      { label: 'Телефон', value: '+7 900 123-45-67' },
-      { label: 'Email', value: 'ivan@mail.ru' },
-    ],
-  },
-  {
-    title: 'Доставка',
-    rows: [
-      { label: 'Адрес', value: 'ул. Ленина, 10' },
-      { label: 'Способ', value: 'Курьер' },
-      { label: 'Время', value: 'Как можно скорее' },
-    ],
-  },
-  {
-    title: 'Оплата',
-    rows: [
-      { label: 'Способ', value: 'Картой' },
-      { label: 'Карта', value: '•••• 4242' },
-    ],
-  },
-  {
-    title: 'Приложение',
-    rows: [
-      { label: 'Уведомления', value: 'Вкл' },
-      { label: 'Тёмная тема', value: 'Выкл' },
-      { label: 'Язык', value: 'Русский' },
-    ],
-  },
-];
+export default function SettingsScreen({ onEdit, bottomInset }: Props) {
+  const colors = useColors();
+  const { settings, updateSetting } = useStore();
+  let row = 0;
 
-export default function SettingsScreen() {
   return (
     <View style={styles.container}>
-      <Header title="Настройки" />
-      <ScrollView contentContainerStyle={styles.content}>
-        {sections.map((section) => (
+      <ScreenHeader title="Настройки" />
+      <ScrollView contentContainerStyle={[styles.content, { paddingBottom: bottomInset }]}>
+        {settingSections.map((section) => (
           <View key={section.title} style={styles.section}>
-            <Text style={styles.sectionTitle}>{section.title}</Text>
-            {section.rows.map((row) => (
-              <Pressable
-                key={row.label}
-                accessibilityRole="button"
-                style={({ pressed }) => [styles.row, pressed && styles.pressed]}
-              >
-                <Text style={styles.label}>{row.label}</Text>
-                <View style={styles.right}>
-                  <Text style={styles.value} numberOfLines={1}>
-                    {row.value}
-                  </Text>
-                  <Text style={styles.arrow}>›</Text>
-                </View>
-              </Pressable>
-            ))}
+            <FadeIn delay={row * 40}>
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>{section.title}</Text>
+            </FadeIn>
+            {section.fields.map((field) => {
+              const delay = ++row * 40;
+              const isToggle = field.kind === 'toggle';
+              const toggleValue = isToggle && Boolean(settings[field.key]);
+              return (
+                <FadeIn key={field.key} delay={delay}>
+                  <PressableScale
+                    accessibilityRole={isToggle ? 'switch' : 'button'}
+                    scaleTo={0.97}
+                    onPress={() => (isToggle ? updateSetting(field.key, !toggleValue) : onEdit(field))}
+                  >
+                    <FrostCard radius={16} style={styles.row}>
+                      <Text style={[styles.label, { color: colors.text }]}>{field.label}</Text>
+                      <View style={styles.right}>
+                        {isToggle ? (
+                          <Switch
+                            value={toggleValue}
+                            onValueChange={(v) => updateSetting(field.key, v)}
+                            trackColor={{ false: colors.gray, true: colors.accent }}
+                            thumbColor="#FFFFFF"
+                          />
+                        ) : (
+                          <>
+                            <Text style={[styles.value, { color: colors.muted }]} numberOfLines={1}>
+                              {displayValue(field.key, settings)}
+                            </Text>
+                            <Text style={[styles.arrow, { color: colors.text }]}>›</Text>
+                          </>
+                        )}
+                      </View>
+                    </FrostCard>
+                  </PressableScale>
+                </FadeIn>
+              );
+            })}
           </View>
         ))}
       </ScrollView>
@@ -69,28 +69,21 @@ export default function SettingsScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
-  content: { paddingHorizontal: 20, paddingBottom: 24 },
+  container: { flex: 1 },
+  content: { paddingHorizontal: 20 },
   section: { marginBottom: 20 },
-  sectionTitle: {
-    fontFamily: fonts.bold,
-    fontSize: 16,
-    color: colors.text,
-    marginBottom: 10,
-  },
+  sectionTitle: { fontFamily: fonts.bold, fontSize: 16, marginBottom: 10 },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: colors.card,
-    borderRadius: 14,
     paddingHorizontal: 16,
-    paddingVertical: 16,
+    minHeight: 56,
+    paddingVertical: 10,
     marginBottom: 8,
   },
-  pressed: { opacity: 0.7 },
-  label: { fontFamily: fonts.medium, fontSize: 14, color: colors.text },
+  label: { fontFamily: fonts.medium, fontSize: 14 },
   right: { flexDirection: 'row', alignItems: 'center', gap: 10, flexShrink: 1, marginLeft: 12 },
-  value: { fontFamily: fonts.regular, fontSize: 13, color: colors.muted, flexShrink: 1 },
-  arrow: { fontFamily: fonts.medium, fontSize: 22, color: colors.text, lineHeight: 24 },
+  value: { fontFamily: fonts.regular, fontSize: 13, flexShrink: 1 },
+  arrow: { fontFamily: fonts.medium, fontSize: 22, lineHeight: 24 },
 });
