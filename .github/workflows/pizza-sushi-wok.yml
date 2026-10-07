@@ -1,0 +1,42 @@
+name: Пицца Суши Вок
+
+on:
+  push:
+    paths:
+      - 'pizza-sushi-wok/**'
+      - '.github/workflows/pizza-sushi-wok.yml'
+  pull_request:
+    paths:
+      - 'pizza-sushi-wok/**'
+      - '.github/workflows/pizza-sushi-wok.yml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: pizza-sushi-wok
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: pizza-sushi-wok/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Build web version
+        run: npm run build:web
+
+      - name: Upload web build
+        uses: actions/upload-artifact@v4
+        with:
+          name: pizza-sushi-wok-web
+          path: pizza-sushi-wok/dist
