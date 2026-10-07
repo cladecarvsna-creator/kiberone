@@ -1,0 +1,34 @@
+{
+  "expo": {
+    "name": "Бурмалда",
+    "slug": "burmalda",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#0E0619",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0E0619"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.kiberone.burmalda"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#21093D",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false,
+      "package": "com.kiberone.burmalda",
+      "versionCode": 1
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    }
+  }
+}

@@ -1,0 +1,42 @@
+name: Бурмалда
+
+on:
+  push:
+    paths:
+      - 'burmalda/**'
+      - '.github/workflows/burmalda.yml'
+  pull_request:
+    paths:
+      - 'burmalda/**'
+      - '.github/workflows/burmalda.yml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: burmalda
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: burmalda/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Build web version
+        run: npm run build:web
+
+      - name: Upload web build
+        uses: actions/upload-artifact@v4
+        with:
+          name: burmalda-web
+          path: burmalda/dist
