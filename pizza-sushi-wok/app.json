@@ -1,0 +1,28 @@
+{
+  "expo": {
+    "name": "Пицца Суши Вок",
+    "slug": "pizza-sushi-wok",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.kiberone.pizzasushiwok"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#FFC700",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false,
+      "package": "com.kiberone.pizzasushiwok",
+      "versionCode": 1
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    }
+  }
+}
